@@ -1,0 +1,71 @@
+# Modèle de pipeline d'intégration continue pour un projet Node.
+#
+# À copier vers .github/workflows/ci.yml dans le projet consommateur, puis adapter :
+#   - le nœud de versions (22, 20) ;
+#   - les commandes de lint, de types et de build selon l'outillage réel ;
+#   - les seuils de couverture, identiques à ceux de docs/tests/README.md.
+#
+# Les seuils de couverture sont aussi déclarés dans vitest.config.ts ou
+# pyproject.toml : la CI est une seconde barrière, pas la première.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      - name: Linter
+        run: npm run lint
+
+      - name: Format
+        run: npm run format:check
+
+      - name: Types
+        if: "hashFiles('**/tsconfig.json') != ''"
+        run: npm run typecheck
+
+      - name: Tests et couverture
+        run: npm run test:coverage
+
+      - name: Build
+        run: npm run build
+
+      - name: Recherche de secrets commités par erreur
+        run: |
+          if git ls-files --error-unmatch .env 2>/dev/null; then
+            echo "::error::un fichier .env est versionné"
+            exit 1
+          fi
+        shell: bash
+
+      - name: Rapport de couverture
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: couverture
+          path: coverage/
+          retention-days: 7
+          if-no-files-found: ignore

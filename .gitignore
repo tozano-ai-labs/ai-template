@@ -1,0 +1,28 @@
+# Système
+.DS_Store
+Thumbs.db
+*.swp
+
+# Éditeurs
+.idea/
+.vscode/
+
+# Dépendances
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Build
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Secrets : ne doit jamais être committé
+.env
+.env.*
+!.env.example
+*.pem
+*.key

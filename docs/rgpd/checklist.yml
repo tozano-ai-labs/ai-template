@@ -1,0 +1,545 @@
+# Checklist RGPD — source de vérité
+#
+# Ce fichier est la source. docs/rgpd/CHECKLIST.md est généré à partir d'ici par
+# scripts/generate-checklist.py et ne doit jamais être édité à la main.
+#
+# Un projet consommateur ne modifie pas ce fichier : il tient son état dans
+# docs/rgpd/etat.yml, où chaque item reprend son identifiant et son statut.
+
+meta:
+  version: 1.0.0
+  socle: RGPD et référentiels CNIL
+  update: >-
+    Une modification de cette checklist doit être versionnée dans le dépôt du
+    template, accompagnée d'une entrée dans CHANGELOG.md.
+
+# Criticité d'un item.
+#   bloquant   — l'absence de conformité expose le projet ou les personnes.
+#   important  — conformité attendue, absence à corriger ou à documenter.
+#   recommande — bonne pratique, sans risque immédiat.
+criticites:
+  - id: bloquant
+    libelle: Bloquant
+    description: À corriger avant toute mise en production.
+  - id: important
+    libelle: Important
+    description: À corriger ou à justifier par écrit.
+  - id: recommande
+    libelle: Recommandé
+    description: Utile, non bloquant.
+
+# Statuts possibles dans docs/rgpd/etat.yml.
+statuts:
+  - id: a_verifier
+    libelle: À vérifier
+  - id: conforme
+    libelle: Conforme
+  - id: non_conforme
+    libelle: Non conforme
+  - id: non_applicable
+    libelle: Non applicable
+
+sections:
+  - id: finalites
+    titre: Finalités et périmètre
+    intro: >-
+      Avant toute autre question, savoir ce que le projet fait et pourquoi. Un
+      traitement sans finalité écrite ne peut pas être loyal.
+    items:
+      - id: RGPD-FIN-01
+        question: Les finalités du projet sont-elles écrites, déterminées et explicites ?
+        preuve: Une section « finalités » dans un document interne ou le README
+        criticite: bloquant
+        refs: ["RGPD art. 5.1.b"]
+      - id: RGPD-FIN-02
+        question: Chaque traitement a-t-il un périmètre délimité, et sait-on ce qui n'est pas traité ?
+        preuve: Liste des traitements couverts et exclus
+        criticite: important
+        refs: ["RGPD art. 5.1.b", "art. 30"]
+      - id: RGPD-FIN-03
+        question: Les personnes concernées sont-elles identifiées (utilisateurs, prospects, salariés, visiteurs) ?
+        preuve: Mention des catégories de personnes concernées
+        criticite: important
+        refs: ["RGPD art. 30"]
+      - id: RGPD-FIN-04
+        question: Les données réellement collectées sont-elles celles annoncées aux utilisateurs ?
+        preuve: Comparaison entre le formulaire ou l'API et la documentation
+        criticite: bloquant
+        refs: ["RGPD art. 5.1.a", "art. 12"]
+      - id: RGPD-FIN-05
+        question: Les usages secondaires (statistiques, amélioration, démonstration) sont-ils séparés des usages annoncés ?
+        preuve: Liste des usages et de leur qualification
+        criticite: important
+        refs: ["RGPD art. 5.1.b", "art. 6.4"]
+
+  - id: base-legale
+    titre: Bases légales
+    intro: >-
+      Aucun traitement n'est licite sans base légale. L'intérêt légitime n'est pas une
+      formule magique : il se documente et se teste.
+    items:
+      - id: RGPD-BL-01
+        question: Chaque traitement repose-t-il sur une base légale identifiée et documentée ?
+        preuve: Colonne « base légale » non vide pour chaque ligne du registre des traitements
+        criticite: bloquant
+        refs: ["RGPD art. 6", "art. 13.1.c"]
+      - id: RGPD-BL-02
+        question: L'intérêt légitime est-il mis en balance, pesé, et documenté ?
+        preuve: "Note d'intérêt légitime : intérêt, impact, mesures de sauvegarde"
+        criticite: important
+        refs: ["RGPD art. 6.1.f", "RGPDL 29"]
+      - id: RGPD-BL-03
+        question: Les données sensibles ou les données concernant des mineurs font-ils l'objet d'un traitement renforcé ?
+        preuve: Mention du caractère sensible ou du public jeune âge, et mesures prévues
+        criticite: bloquant
+        refs: ["RGPD art. 9", "RGPDL 28"]
+      - id: RGPD-BL-04
+        question: Les champs obligatoires sont-ils réellement indispensables à la finalité annoncée ?
+        preuve: Justification champ par champ
+        criticite: important
+        refs: ["RGPD art. 5.1.c"]
+      - id: RGPD-BL-05
+        question: Les données prévues à l'origine pour une finalité ne sont-elles pas réemployées sans nouvelle base légale ?
+        preuve: Revue des champs réutilisés et de leur nouvelle base légale
+        criticite: important
+        refs: ["RGPD art. 5.1.b", "art. 6.4"]
+
+  - id: consentement
+    titre: Consentement
+    intro: >-
+      Le consentement n'est qu'une base légale parmi cinq. Il ne sert que lorsque
+      les autres ne s'appliquent pas, et il a des exigences de forme strictes.
+    items:
+      - id: RGPD-CNS-01
+        question: Le consentement est-il recueilli lorsque c'est la base légale retenue, et seulement dans ce cas ?
+        preuve: Base légale retenue par traitement et formulaire de recueil
+        criticite: bloquant
+        refs: ["RGPD art. 6.1.a", "art. 7"]
+      - id: RGPD-CNS-02
+        question: Le consentement est-il libre, spécifique, informé, explicite et dénué d'ambiguïté ?
+        preuve: Texte du consentement et granularité des finalités proposées séparément
+        criticite: important
+        refs: ["RGPD art. 4.11", "art. 7.2"]
+      - id: RGPD-CNS-03
+        question: Le refus est-il aussi simple que l'acceptation, et le silence vaut-il refus ?
+        preuve: Parcours de refus et absence de consentement par défaut
+        criticite: important
+        refs: ["RGPD art. 7.3", "RGPDL 25"]
+      - id: RGPD-CNS-04
+        question: Le retrait du consentement est-il aussi accessible que l'acceptation, à tout moment ?
+        preuve: Lien ou bouton de retrait, et son effet effectif sur le traitement
+        criticite: important
+        refs: ["RGPD art. 7.3"]
+      - id: RGPD-CNS-05
+        question: L'historique des consentements est-il conservé pour prouver le consentement ?
+        preuve: Journal horodaté des acceptations et refus
+        criticite: important
+        refs: ["RGPD art. 7.1"]
+      - id: RGPD-CNS-06
+        question: L politique de confidentialité présente-t-elle clairement le responsable, ses coordonnées et les droits ?
+        preuve: Page ou fichier de politique de confidentialité accessible
+        criticite: bloquant
+        refs: ["RGPD art. 13", "art. 14"]
+
+  - id: minimisation
+    titre: Minimisation
+    intro: Ne collecter que ce qui sert la finalité, et rien de plus.
+    items:
+      - id: RGPD-MIN-01
+        question: Chaque champ collecté est-il nécessaire à la finalité annoncée ?
+        preuve: Tableau champ / finalité / nécessité
+        criticite: bloquant
+        refs: ["RGPD art. 5.1.c"]
+      - id: RGPD-MIN-02
+        question: Les champs facultatifs sont-ils réellement facultatifs, et leur saisie acceptée sans justification particulière ?
+        preuve: Comportement du formulaire pour un champ optionnel
+        criticite: important
+        refs: ["RGPD art. 5.1.c"]
+      - id: RGPD-MIN-03
+        question: Les données techniques collectées (adresse IP, identifiant, user-agent) sont-elles limitées au nécessaire ?
+        preuve: Liste des en-têtes et métadonnées collectés, et usage de chacun
+        criticite: important
+        refs: ["RGPD art. 5.1.c"]
+      - id: RGPD-MIN-04
+        question: Les données sont-elles pseudonymisées ou anonymisées quand l'identification n'est pas nécessaire ?
+        preuve: Mécanisme de pseudonymisation en place, clés conservées séparément
+        criticite: important
+        refs: ["RGPD art. 5.1.c", "art. 25", "RGPDL 26"]
+      - id: RGPD-MIN-05
+        question: Les données libres sont-elles exclues ou nettoyées avant exploitation ?
+        preuve: Liste des champs libres et règle de nettoyage
+        criticite: important
+        refs: ["RGPD art. 5.1.c"]
+
+  - id: conservation
+    titre: Durées de conservation
+    intro: >-
+      Une donnée conservée indéfiniment est une donnée conservée sans base légale.
+      Chaque catégorie a une durée, et la purge est automatique et vérifiable.
+    items:
+      - id: RGPD-CON-01
+        question: Une durée de conservation est-elle définie pour chaque catégorie de données ?
+        preuve: Table des durées par catégorie
+        criticite: bloquant
+        refs: ["RGPD art. 5.1.e", "art. 13.2.a"]
+      - id: RGPD-CON-02
+        question: La purge est-elle automatique, et non dépendante d'une intervention manuelle ?
+        preuve: Tâche planifiée ou déclencheur de purge, et sa fréquence
+        criticite: bloquant
+        refs: ["RGPD art. 5.1.e"]
+      - id: RGPD-CON-03
+        question: La purge couvre-t-elle les journaux, sessions, sauvegardes et fichiers temporaires ?
+        preuve: Inventaire des emplacements de stockage et règle appliquée à chacun
+        criticite: important
+        refs: ["RGPD art. 5.1.e"]
+      - id: RGPD-CON-04
+        question: La durée du cookie de consentement expire-t-elle au plus tard après sa pose ?
+        preuve: Durée maximale du cookie
+        criticite: important
+        refs: ["RGPD art. 5.1.e", "RGPDL 25"]
+      - id: RGPD-CON-05
+        question: Un compte inactif est-il purgé automatiquement au terme de la durée prévue ?
+        preuve: Règle d'inactivité et tâche associée
+        criticite: recommande
+        refs: ["RGPD art. 5.1.e"]
+
+  - id: destinataires
+    titre: Destinataires et sous-traitance
+    intro: >-
+      Chaque destinataire est un sous-traitant tant qu'il traite pour le compte du
+      responsable. Un hébergeur, un service d'email, un fournisseur de modèle : tous
+      doivent figurer dans la liste.
+    items:
+      - id: RGPD-DES-01
+        question: La liste des destinataires et sous-traitants est-elle connue, complète et à jour ?
+        preuve: Liste nominative avec rôle pour chacun
+        criticite: bloquant
+        refs: ["RGPD art. 28", "art. 30.2"]
+      - id: RGPD-DES-02
+        question: Chaque sous-traitant est-il encadré par un contrat conforme à l'article 28 ?
+        preuve: Référence aux contrats ou clauses de sous-traitance
+        criticite: bloquant
+        refs: ["RGPD art. 28.3"]
+      - id: RGPD-DES-03
+        question: Les sous-traitants hors Union européenne sont-ils encadrés par une garantie de transfert ?
+        preuve: Décision d'adéquation, clauses contractuelles types ou disposition particularisée
+        criticite: important
+        refs: ["RGPD art. 44 à 49"]
+      - id: RGPD-DES-04
+        question: Les utilisateurs sont-ils informés des destinataires et de leurs finalités ?
+        preuve: Mention dans la politique de confidentialité
+        criticite: important
+        refs: ["RGPD art. 13.1.e", "art. 14.1.e"]
+      - id: RGPD-DES-05
+        question: Les accès internes sont-ils limités au strict nécessaire, avec une traçabilité des accès ?
+        preuve: Matrice des rôles et journal des accès aux données
+        criticite: important
+        refs: ["RGPD art. 5.1.f", "art. 32"]
+
+  - id: transferts
+    titre: Transferts hors Union européenne
+    intro: Distinguer transfert et traitement dans l'Union. Les lignes ci-dessous ne concernent que les seconds.
+    items:
+      - id: RGPD-TRF-01
+        question: Les données quittent-elles l'Union européenne, et pour quels destinataires ?
+        preuve: Inventaire des flux sortants et des pays de destination
+        criticite: bloquant
+        refs: ["RGPD art. 44"]
+      - id: RGPD-TRF-02
+        question: Chaque transfert est-il encadré par un mécanisme reconnu ?
+        preuve: Référence au mécanisme utilisé par transfert
+        criticite: bloquant
+        refs: ["RGPD art. 45 à 49"]
+      - id: RGPD-TRF-03
+        question: Les transferts sont-ils mentionnés à l'information des personnes ?
+        preuve: Mention des transferts dans la politique de confidentialité
+        criticite: important
+        refs: ["RGPD art. 13.1.f"]
+
+  - id: droits
+    titre: Droits des personnes
+    intro: >-
+      Six droits d'identique portée : accès, rectification, effacement,
+      limitation, portabilité, plus l'opposition. Le backlog existe tant qu'on ne
+      sait pas les exécuter.
+    items:
+      - id: RGPD-DRT-01
+        question: "Le droit d'accès est-il outillé : une demande aboutit-elle à une extraction complète de la personne concernée ?"
+        preuve: Parcours testé de bout en bout, avec sa date de test
+        criticite: bloquant
+        refs: ["RGPD art. 15"]
+      - id: RGPD-DRT-02
+        question: La rectification est-elle possible par la personne elle-même, sans passer par un tiers ?
+        preuve: Parcours de modification testé
+        criticite: important
+        refs: ["RGPD art. 16"]
+      - id: RGPD-DRT-03
+        question: L'effacement est-il réellement exécuté, données comprises, dans tous les systèmes ?
+        preuve: Procédure d'effacement avec liste des systèmes traversés et test
+        criticite: bloquant
+        refs: ["RGPD art. 17"]
+      - id: RGPD-DRT-04
+        question: L'effacement atteint-il les copies, sauvegardes, index de recherche et vecteurs ?
+        preuve: Inventaire des emplacements et traitement de chacun
+        criticite: important
+        refs: ["RGPD art. 17", "art. 5.1.e"]
+      - id: RGPD-DRT-05
+        question: La limitation du traitement est-elle possible, et le traitement reprend-il correctement ensuite ?
+        preuve: Drapeaux de limitation dans le schéma de données
+        criticite: important
+        refs: ["RGPD art. 18"]
+      - id: RGPD-DRT-06
+        question: La portabilité est-elle fournie dans un format lisible par machine ?
+        preuve: Format de l'export et procédure de génération
+        criticite: important
+        refs: ["RGPD art. 20"]
+      - id: RGPD-DRT-07
+        question: L'opposition est-elle outillée, y compris pour la prospection ?
+        preuve: Liste des traitements fondés sur l'intérêt légitime et sur le consentement, avec leur liste d'exclusion
+        criticite: important
+        refs: ["RGPD art. 21"]
+      - id: RGPD-DRT-08
+        question: Le délai de réponse d'un mois est-il suivi, et les demandes sont-elles registrées ?
+        preuve: Registre des demandes avec date de réception et de réponse
+        criticite: important
+        refs: ["RGPD art. 12.3"]
+      - id: RGPD-DRT-09
+        question: L'identité du demandeur est-elle vérifiée avant l'exécution d'un droit ?
+        preuve: Procédure de vérification d'identité
+        criticite: important
+        refs: ["RGPD art. 12.6"]
+      - id: RGPD-DRT-10
+        question: Le responsable et un contact sont-ils identifiés et joignables pour les demandes ?
+        preuve: Coordonnées publiées et surveillées
+        criticite: bloquant
+        refs: ["RGPD art. 13.1.a", "art. 37.1.b"]
+      - id: RGPD-DRT-11
+        question: Une décision automatisée produisant un effet juridique est-elle signalée, motivée et contestable ?
+        preuve: Description du dispositif, intervention humaine et voie de contestation
+        criticite: important
+        refs: ["RGPD art. 22"]
+
+  - id: securite
+    titre: Sécurité des données
+    intro: Les mesures techniques sont adaptées au risque, pas à la tendance.
+    items:
+      - id: RGPD-SEC-01
+        question: Les données circulent-elles en TLS, y compris entre services internes ?
+        preuve: Configuration et en-têtes observés
+        criticite: bloquant
+        refs: ["RGPD art. 32.1.a"]
+      - id: RGPD-SEC-02
+        question: Les données au repos sont-elles chiffrées quand le risque le justifie ?
+        preuve: Chiffrement du stockage, des sauvegardes et des volumes
+        criticite: important
+        refs: ["RGPD art. 32.1.a"]
+      - id: RGPD-SEC-03
+        question: Les secrets sont-ils hors du dépôt, dans l'environnement ou un gestionnaire dédié ?
+        preuve: Absence de secret versionné, présence de .env.example
+        criticite: bloquant
+        refs: ["RGPD art. 32.1.b"]
+      - id: RGPD-SEC-04
+        question: L'authentification et l'autorisation sont-elles vérifiées côté serveur sur chaque route sensible ?
+        preuve: Test d'accès non autorisé sur une route protégée
+        criticite: bloquant
+        refs: ["RGPD art. 25", "art. 32.1.b"]
+      - id: RGPD-SEC-05
+        question: Les entrées sont-elles validées avant traitement, et les sorties échappées au rendu ?
+        preuve: Comportement sur entrée malformée et test de rendu
+        criticite: important
+        refs: ["RGPD art. 25", "art. 32.1.a"]
+      - id: RGPD-SEC-06
+        question: Les en-têtes de sécurité et la politique CORS sont-ils restreints au nécessaire ?
+        preuve: Configuration effective et en-têtes produits
+        criticite: important
+        refs: ["RGPD art. 25", "art. 32.1.b"]
+      - id: RGPD-SEC-07
+        question: Les données personnelles sont-elles absentes des journaux, y compris les messages d'erreur ?
+        preuve: Extraction d'un échantillon de journaux et recherche de champs personnels
+        criticite: bloquant
+        refs: ["RGPD art. 5.1.f", "art. 32"]
+
+  - id: cookies
+    titre: Cookies et traceurs
+    intro: >-
+      Soumis au RGPD et à la directive ePrivacy : le consentement préalable s'applique
+      à tout traceur non strictement nécessaire.
+    items:
+      - id: RGPD-COO-01
+        question: Chaque cookie et traceur est-il inventorié avec sa finalité et sa durée ?
+        preuve: Table des cookies ou du bandeau de consentement
+        criticite: important
+        refs: ["RGPD art. 6.1.a", "RGPDL 25"]
+      - id: RGPD-COO-02
+        question: Aucun traceur non essentiel n'est-il déposé avant consentement ?
+        preuve: Observation du dépôt de traceurs avant action sur la bannière
+        criticite: bloquant
+        refs: ["RGPDL 25", "RGPD art. 7"]
+      - id: RGPD-COO-03
+        question: Le refus est-il aussi simple que l'acceptation, par le même nombre de clics ?
+        preuve: Parcours comparé des deux choix
+        criticite: important
+        refs: ["RGPDL 25"]
+      - id: RGPD-COO-04
+        question: Le consentement est-il demandé pour chaque finalité distincte, et non en bloc ?
+        preuve: Catégories de finalités dans la bannière
+        criticite: important
+        refs: ["RGPDL 25", "RGPD art. 7.2"]
+      - id: RGPD-COO-05
+        question: Le retrait du consentement aux cookies est-il accessible à tout moment ?
+        preuve: Lien de retrait présent sur toutes les pages
+        criticite: important
+        refs: ["RGPD art. 7.3"]
+
+  - id: violations
+    titre: Violations de données
+    intro: La procédure existe avant l'incident, pas pendant.
+    items:
+      - id: RGPD-VIO-01
+        question: Une procédure de détection et de qualification d'une violation est-elle écrite et connue ?
+        preuve: Procédure datée et accessible
+        criticite: important
+        refs: ["RGPD art. 33"]
+      - id: RGPD-VIO-02
+        question: Le délai de notification de 72 heures est-il outillé et connu de l'équipe ?
+        preuve: Mention du délai, du responsable et du canal d'escalade
+        criticite: bloquant
+        refs: ["RGPD art. 33.1"]
+      - id: RGPD-VIO-03
+        question: Les personnes concernées sont-elles informées lorsque le risque est élevé ?
+        preuve: Modèle de message et critère de déclenchement
+        criticite: important
+        refs: ["RGPD art. 34"]
+      - id: RGPD-VIO-04
+        question: Les violations sont-elles registrées, y compris celles non notifiées ?
+        preuve: Registre des violations avec date, type, impact
+        criticite: important
+        refs: ["RGPD art. 33.5"]
+
+  - id: gouvernance
+    titre: Gouvernance
+    intro: Ce qui permet de démontrer la conformité le jour où on la demande.
+    items:
+      - id: RGPD-GOV-01
+        question: Le registre des traitements est-il tenu à jour et contient-il les éléments exigés par l'article 30 ?
+        preuve: Registre avec finalité, catégories de données, base légale, destinataires, durées
+        criticite: bloquant
+        refs: ["RGPD art. 30"]
+      - id: RGPD-GOV-02
+        question: L'information des personnes est-elle à jour et réellement lisible par elles ?
+        preuve: Politique de confidentialité publiée, datée, testée
+        criticite: bloquant
+        refs: ["RGPD art. 12.1", "art. 13"]
+      - id: RGPD-GOV-03
+        question: Les personnes concernées reçoivent-elles l'information au moment de la collecte, pas seulement sur demande ?
+        preuve: Mention visible au moment de la collecte
+        criticite: important
+        refs: ["RGPD art. 13", "art. 14"]
+      - id: RGPD-GOV-04
+        question: Un contact désigné pour la protection des données existe-t-il, ou la non-nomination est-elle justifiée ?
+        preuve: Nomination écrite, ou motif de non-nomination selon la taille
+        criticite: important
+        refs: ["RGPD art. 37", "RGPDL 16"]
+      - id: RGPD-GOV-05
+        question: L'équipe connaît-elle les règles applicables et sait-elle où les trouver ?
+        preuve: Document d'accueil et accès à la présente documentation
+        criticite: recommande
+        refs: ["RGPD art. 39"]
+      - id: RGPD-GOV-06
+        question: Les personnes concernées sont-elles sensibilisées au traitement de leurs données ?
+        preuve: Trace d'une action de sensibilisation
+        criticite: recommande
+        refs: ["RGPD art. 39.1.b"]
+
+  - id: ia
+    titre: Systèmes IA
+    intro: >-
+      Points spécifiques à un projet qui appelle un modèle. Héritent des exigences des
+      sections précédentes : le traitement d'un prompt obéit aux mêmes règles que
+      n'importe quelle donnée personnelle.
+    items:
+      - id: RGPD-IA-01
+        question: Le contenu exact envoyé au modèle est-il connu, champ par champ, y compris l'historique et les métadonnées ?
+        preuve: Reconstruction du prompt à partir du code, avec la liste des champs
+        criticite: bloquant
+        refs: ["RGPD art. 5.1.c", "art. 30"]
+      - id: RGPD-IA-02
+        question: Les données envoyées au modèle sont-elles minimisées, et le contenu non nécessaire est-il retiré ?
+        preuve: Comparaison entre les données disponibles et les données envoyées
+        criticite: bloquant
+        refs: ["RGPD art. 5.1.c", "art. 25"]
+      - id: RGPD-IA-03
+        question: Les données sont-elles pseudonymisées ou anonymisées avant l'envoi au modèle ?
+        preuve: Transformation appliquée avant appel, clés conservées côté serveur
+        criticite: important
+        refs: ["RGPD art. 25", "RGPDL 26"]
+      - id: RGPD-IA-04
+        question: Aucun secret ni identifiant direct ne figure-t-il dans un prompt ?
+        preuve: Revue des prompts et des gabarits, test sur un jeu d'entrées
+        criticite: bloquant
+        refs: ["RGPD art. 32.1.b"]
+      - id: RGPD-IA-05
+        question: Le fournisseur du modèle est-il identifié, et son rôle de sous-traitant est-il encadré ?
+        preuve: Nom du fournisseur, localisation, référence au contrat de sous-traitance
+        criticite: bloquant
+        refs: ["RGPD art. 28"]
+      - id: RGPD-IA-06
+        question: Les données envoyées à un fournisseur hors Union européenne sont-elles encadrées ?
+        preuve: Mécanisme de transfert appliqué au fournisseur de modèle
+        criticite: important
+        refs: ["RGPD art. 44 à 49"]
+      - id: RGPD-IA-07
+        question: L'usage des données envoyées pour entraîner ou améliorer un modèle chez le fournisseur est-il exclu contractuellement ?
+        preuve: Clause de non-entraînement, ou mention de l'absence d'usage
+        criticite: important
+        refs: ["RGPD art. 28.3.h"]
+      - id: RGPD-IA-08
+        question: Les prompts et réponses sont-ils journalisés en clair ?
+        preuve: Absence de contenu de prompt dans les journaux, ou hachage en place
+        criticite: bloquant
+        refs: ["RGPD art. 5.1.f", "art. 32"]
+      - id: RGPD-IA-09
+        question: Une durée de conservation est-elle appliquée aux conversations conservées ?
+        preuve: Règle de purge des conversations et tâche associée
+        criticite: important
+        refs: ["RGPD art. 5.1.e"]
+      - id: RGPD-IA-10
+        question: Les vecteurs, index de similarité et bases de connaissances sont-ils inclus dans la purge ?
+        preuve: Inventaire des index et règle appliquée à chacun
+        criticite: important
+        refs: ["RGPD art. 17", "art. 5.1.e"]
+      - id: RGPD-IA-11
+        question: La conservation est-elle désactivable par l'utilisateur ?
+        preuve: Option de non-conservation et effet effectif
+        criticite: important
+        refs: ["RGPD art. 5.1.a"]
+      - id: RGPD-IA-12
+        question: L'utilisateur est-il informé de façon explicite qu'il dialogue avec un système IA ?
+        preuve: Mention visible dans l'interface et dans la politique de confidentialité
+        criticite: important
+        refs: ["RGPD art. 13"]
+      - id: RGPD-IA-13
+        question: Les données d'entraînement ou d'évaluation du modèle sont-elles documentées, y compris leur provenance ?
+        preuve: Inventaire des jeux utilisés, origine et licéité des données
+        criticite: important
+        refs: ["RGPD art. 5.1.b", "RGPDL 18"]
+      - id: RGPD-IA-14
+        question: Les biais connus du modèle sont-ils connus de l'équipe et documentés là où l'IA produit une décision ?
+        preuve: Note de biais connus et mesures d'atténuation
+        criticite: important
+        refs: ["RGPD art. 22", "RGPD art. 5.1.d"]
+      - id: RGPD-IA-15
+        question: Une analyse d'impact relative à la protection des données a-t-elle été menée pour un usage à haut risque ?
+        preuve: AIPD réalisée, ou justification écrite de son absence
+        criticite: important
+        refs: ["RGPD art. 35", "RGPDL 65"]
+      - id: RGPD-IA-16
+        question: Le mode d'hébergement du modèle est-il documenté, en distinguant hébergement local et fournisseur externe ?
+        preuve: Mention de l'hébergeur, de la localisation et de l'absence de sortie de données en local
+        criticite: important
+        refs: ["RGPD art. 28", "art. 44"]
+      - id: RGPD-IA-17
+        question: Le coût et le volume des appels au modèle sont-ils plafonnés pour éviter un traitement non maîtrisé ?
+        preuve: Quotas ou plafonds par utilisateur et par période
+        criticite: recommande
+        refs: ["RGPD art. 5.1.b"]

@@ -1,0 +1,100 @@
+# Manifeste du template ai-template
+#
+# Cette version n'est réellement effective qu'au premier tag git correspondant
+# (v1.0.0). Sans tag, la version déclarée ici est indicative.
+
+name: ai-template
+version: 1.0.0
+description: >-
+  Documentation, rôles d'agents, stratégie de tests et checklist RGPD communes à
+  tous les projets dans lesquels l'IA intervient comme exécutant.
+
+requires:
+  # Prérequis d'outillage, pas des projets consommateurs.
+  opencode: ">=0.14"
+  git: ">=2.30"
+
+# Le générateur de checklist n'est utilisé qu'à la rédaction de ce dépôt.
+authoring:
+  python: ">=3.8"
+  python_packages:
+    - PyYAML
+
+# Profils de tests : un projet en active un ou plusieurs dans ai-template.json.
+profiles:
+  tests:
+    - node-vitest
+    - python-pytest
+  default: node-vitest
+
+# Rôles d'agents fournis dans .opencode/agents/
+agents:
+  - name: architecte
+    mode: subagent
+    role: Découpage, arbitrage technique, rédaction d'ADR. Lecture seule.
+  - name: dev
+    mode: subagent
+    role: Implémentation et tests obligatoires. Alerte sur les points RGPD bloquants.
+  - name: reviewer
+    mode: subagent
+    role: Relecture de code. Lecture seule.
+  - name: test-writer
+    mode: subagent
+    role: Écriture et exécution des tests, couverture.
+  - name: security-auditor
+    mode: subagent
+    role: Audit de sécurité, dépendances, secrets, surface LLM.
+  - name: docs-writer
+    mode: subagent
+    role: Documentation utilisateur et technique. Pas de shell.
+  - name: committer
+    mode: subagent
+    role: Rédaction des commits (gitmoji + type + scope, en anglais). Jamais de push.
+
+# Skills fournis dans .opencode/skills/
+skills:
+  - name: commit-message
+    description: Format de commit du dépôt — gitmoji, type, scope d'étape de développement, corps en anglais.
+  - name: pre-release
+    description: Étapes de vérification avant un tag ou une livraison.
+
+# Checklists fournit dans docs/
+checklists:
+  - name: rgpd
+    source: docs/rgpd/checklist.yml
+    generated: docs/rgpd/CHECKLIST.md
+    state: docs/rgpd/etat.yml
+    blocking: false # alerte seulement, jamais de refus de livraison
+
+# Contenu à copier dans un projet consommateur (chemins relatifs à ce dépôt)
+installs:
+  - source: templates/AGENTS.md.projet
+    target: AGENTS.md
+    overwrite: false
+    personalize: true
+  - source: templates/ai-template.json
+    target: ai-template.json
+    overwrite: false
+    personalize: true
+  - source: templates/github-ci-node.yml
+    target: .github/workflows/ci.yml
+    overwrite: false
+    personalize: false
+  - source: templates/github-ci-python.yml
+    target: .github/workflows/ci.yml
+    overwrite: false
+    personalize: false
+  - source: docs/rgpd/modele-etat.yml
+    target: docs/rgpd/etat.yml
+    overwrite: false
+    personalize: true
+
+# Liens à créer manuellement (le symlink n'est pas versionné par ce dépôt)
+links:
+  - source: .opencode/agents
+    target: .opencode/agents
+    type: symlink
+    note: >-
+      Le dossier cible est un lien symbolique vers ce dépôt. À recréer après
+      chaque clone, et à vérifier si opencode ne suit pas les répertoires
+      symboliques (voir README, section « Dépannage »).
